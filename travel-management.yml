@@ -185,6 +185,8 @@ paths:
   /auth/login:
     post:
       summary: User login
+      security:
+        - ApiKeyAuth: []
       description: Authenticate a user and return a token.
       operationId: loginUser
       tags:
