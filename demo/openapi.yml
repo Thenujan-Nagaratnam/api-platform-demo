@@ -1,0 +1,238 @@
+openapi: 3.0.3
+info:
+  title: Library Management API
+  description: API for managing a library system, including books, authors, and borrowers.
+  version: 1.0.0
+servers:
+  - url: https://api.librarymanagement.com/v1
+    description: Production server
+  - url: https://sandbox.api.librarymanagement.com/v1
+    description: Sandbox server
+paths:
+  /books:
+    get:
+      summary: Get all books
+      description: Retrieve a list of all books in the library.
+      responses:
+        '200':
+          description: A list of books.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    - id: 1
+                      title: The Great Gatsby
+                      author: F. Scott Fitzgerald
+                      publishedYear: 1925
+                    - id: 2
+                      title: '1984'
+                      author: George Orwell
+                      publishedYear: 1949
+    post:
+      summary: Add a new book
+      description: Add a new book to the library.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBook'
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  title: To Kill a Mockingbird
+                  author: Harper Lee
+                  publishedYear: 1960
+      responses:
+        '200':
+          description: ''
+          x-name: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                title: The Art of Coding
+                author: Jane Smith
+                publishedYear: 2023
+        '201':
+          description: Book created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: ''
+          x-name: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+  /books/{bookId}:
+    get:
+      summary: Get a book by ID
+      description: Retrieve details of a specific book by its ID.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the book to retrieve.
+      responses:
+        '200':
+          description: Book details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found.
+    put:
+      summary: Update a book
+      description: Update the details of an existing book.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the book to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBook'
+      responses:
+        '200':
+          description: Book updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found.
+    delete:
+      summary: Delete a book
+      description: Remove a book from the library.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the book to delete.
+      responses:
+        '204':
+          description: Book deleted successfully.
+        '404':
+          description: Book not found.
+  /auth/login:
+    post:
+      summary: User login
+      description: Authenticate a user and return a session token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              example1:
+                summary: Example login request
+                value:
+                  username: johndoe
+                  password: password123
+      responses:
+        '200':
+          description: Login successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              examples:
+                example1:
+                  summary: Example login response
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Invalid credentials.
+  /auth/logout:
+    post:
+      summary: User logout
+      description: Log out the current user and invalidate the session token.
+      responses:
+        '204':
+          description: Logout successful.
+  /sample-resource:
+    get:
+      summary: Get sample resource
+      description: Retrieve information about a sample resource.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Success response
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the book.
+        title:
+          type: string
+          description: Title of the book.
+        author:
+          type: string
+          description: Author of the book.
+        publishedYear:
+          type: integer
+          description: Year the book was published.
+    NewBook:
+      type: object
+      required:
+        - title
+        - author
+        - publishedYear
+      properties:
+        title:
+          type: string
+          description: Title of the book.
+        author:
+          type: string
+          description: Author of the book.
+        publishedYear:
+          type: integer
+          description: Year the book was published.
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: The username of the user.
+        password:
+          type: string
+          description: The password of the user.
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: The session token for the authenticated user.
